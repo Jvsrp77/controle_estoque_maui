@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="controle_estoque_maui.Views.FornecedorPage"
+             BackgroundColor="#F4F6F9"
+             Title="Cadastro de Fornecedores">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+
+            <Frame BackgroundColor="White" CornerRadius="10" HasShadow="True" BorderColor="Transparent" Padding="20">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="🏢 Novo Fornecedor" FontSize="16" FontAttributes="Bold" TextColor="#2C3E50"/>
+                    <Entry x:Name="txtNomeEmpresa" Placeholder="Nome da Empresa / Razão Social" TextColor="Black" PlaceholderColor="#7F8C8D" BackgroundColor="#F8F9FA"/>
+                    <Entry x:Name="txtCnpj" Placeholder="CNPJ (Ex: 12.345.678/0001-99)" TextColor="Black" PlaceholderColor="#7F8C8D" BackgroundColor="#F8F9FA"/>
+                    <Button Text="Salvar Fornecedor" Clicked="OnSalvarFornecedorClicked" BackgroundColor="#2980B9" TextColor="White" FontAttributes="Bold"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <Label Text="Lista de Fornecedores Registrados" FontSize="16" FontAttributes="Bold" TextColor="#2C3E50"/>
+
+            <CollectionView x:Name="listaFornecedoresCollection">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame BackgroundColor="White" CornerRadius="8" Margin="0,5" Padding="15" BorderColor="Transparent">
+                            <VerticalStackLayout>
+                                <Label Text="{Binding IdFornecedor, StringFormat='ID: {0}'}" FontSize="11" FontAttributes="Bold" TextColor="#7F8C8D"/>
+                                <Label Text="{Binding NomeEmpresa}" FontSize="15" FontAttributes="Bold" TextColor="#2C3E50"/>
+                                <Label Text="{Binding Cnpj, StringFormat='CNPJ: {0}'}" FontSize="13" TextColor="#34495E"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

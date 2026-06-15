@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="controle_estoque_maui.Views.CategoriaPage"
+             BackgroundColor="#F4F6F9"
+             Title="Cadastro de Categorias">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+
+            <Frame BackgroundColor="White" CornerRadius="10" HasShadow="True" BorderColor="Transparent" Padding="20">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="📁 Nova Categoria" FontSize="16" FontAttributes="Bold" TextColor="#2C3E50"/>
+                    <Entry x:Name="txtNomeCategoria" Placeholder="Nome da Categoria (Ex: Notebooks)" TextColor="Black" PlaceholderColor="#7F8C8D" BackgroundColor="#F8F9FA"/>
+                    <Button Text="Salvar Categoria" Clicked="OnSalvarCategoriaClicked" BackgroundColor="#8E44AD" TextColor="White" FontAttributes="Bold"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <Label Text="Categorias Ativas" FontSize="16" FontAttributes="Bold" TextColor="#2C3E50"/>
+
+            <CollectionView x:Name="listaCategoriasCollection">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame BackgroundColor="White" CornerRadius="8" Margin="0,5" Padding="15" BorderColor="Transparent">
+                            <HorizontalStackLayout Spacing="10">
+                                <Label Text="{Binding IdCategoria, StringFormat='ID: {0} - '}" FontAttributes="Bold" TextColor="#7F8C8D"/>
+                                <Label Text="{Binding Nome}" FontSize="15" FontAttributes="Bold" TextColor="#2C3E50"/>
+                            </HorizontalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

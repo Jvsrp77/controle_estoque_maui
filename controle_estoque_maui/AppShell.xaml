@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="controle_estoque_maui.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:controle_estoque_maui.Views"
+    Shell.FlyoutBehavior="Disabled"
+    Title="Tech Stock Pro">
+
+    <TabBar>
+        <Tab Title="📦 Estoque" Icon="estoque_icon.png">
+            <ShellContent ContentTemplate="{DataTemplate views:EstoquePage}" Route="EstoquePage" />
+        </Tab>
+        <Tab Title="🏢 Fornecedores">
+            <ShellContent ContentTemplate="{DataTemplate views:FornecedorPage}" Route="FornecedorPage" />
+        </Tab>
+        <Tab Title="📁 Categorias">
+            <ShellContent ContentTemplate="{DataTemplate views:CategoriaPage}" Route="CategoriaPage" />
+        </Tab>
+    </TabBar>
+
+</Shell>

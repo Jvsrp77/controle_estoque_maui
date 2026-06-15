@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="controle_estoque_maui.Views.EstoquePage"
+             BackgroundColor="#F4F6F9"
+             Title="Controle de Estoque">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+
+            <Frame BackgroundColor="#1E1E2E" CornerRadius="12" BorderColor="Transparent" Padding="20">
+                <HorizontalStackLayout Spacing="15" VerticalOptions="Center">
+                    <Label Text="📦" FontSize="32" VerticalOptions="Center"/>
+                    <VerticalStackLayout VerticalOptions="Center">
+                        <Label Text="TECH STOCK" FontSize="24" FontAttributes="Bold" TextColor="White"/>
+                        <Label Text="Gerenciamento de Eletrônicos" FontSize="14" TextColor="#A5A5B5"/>
+                    </VerticalStackLayout>
+                </HorizontalStackLayout>
+            </Frame>
+
+            <Grid ColumnDefinitions="*, *" ColumnSpacing="15">
+                <Frame Grid.Column="0" BackgroundColor="#FFFFFF" CornerRadius="10" BorderColor="Transparent" Padding="15">
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Produtos em Estoque" FontSize="14" TextColor="#7F8C8D" FontAttributes="Bold"/>
+                        <Label x:Name="lblTotalProdutos" Text="0" FontSize="28" FontAttributes="Bold" TextColor="#2C3E50"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame Grid.Column="1" BackgroundColor="#FFFFFF" CornerRadius="10" BorderColor="Transparent" Padding="15">
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Produtos Esgotados" FontSize="14" TextColor="#7F8C8D" FontAttributes="Bold"/>
+                        <Label x:Name="lblProdutosEsgotados" Text="0" FontSize="28" FontAttributes="Bold" TextColor="#E74C3C"/>
+                    </VerticalStackLayout>
+                </Frame>
+            </Grid>
+
+            <Frame BackgroundColor="White" CornerRadius="10" BorderColor="Transparent" Padding="20">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="⚡ Operações de Estoque" FontSize="16" FontAttributes="Bold" TextColor="#2C3E50"/>
+
+                    <Grid ColumnDefinitions="*, *" ColumnSpacing="20">
+                        <VerticalStackLayout Grid.Column="0" Spacing="10">
+                            <Label Text="Novo Produto" FontAttributes="Bold" TextColor="#34495E" FontSize="14"/>
+                            <Entry x:Name="txtNome" Placeholder="Nome do Eletrônico" TextColor="Black" PlaceholderColor="#7F8C8D" BackgroundColor="#F8F9FA"/>
+                            <Entry x:Name="txtPreco" Placeholder="Preço (Ex: 4500.00)" Keyboard="Numeric" TextColor="Black" PlaceholderColor="#7F8C8D" BackgroundColor="#F8F9FA"/>
+                            <Entry x:Name="txtQuantidade" Placeholder="Qtd Inicial" Keyboard="Numeric" TextColor="Black" PlaceholderColor="#7F8C8D" BackgroundColor="#F8F9FA"/>
+                            <Entry x:Name="txtIdCategoriaProd" Placeholder="ID da Categoria (Ver aba Categorias)" Keyboard="Numeric" TextColor="Black" PlaceholderColor="#7F8C8D" BackgroundColor="#FFF3CD"/>
+                            <Entry x:Name="txtIdFornecedorProd" Placeholder="ID do Fornecedor (Ver aba Fornecedores)" Keyboard="Numeric" TextColor="Black" PlaceholderColor="#7F8C8D" BackgroundColor="#FFF3CD"/>
+                            <Button Text="➕ Cadastrar Produto" Clicked="OnCadastrarClicked" BackgroundColor="#27AE60" TextColor="White" FontAttributes="Bold" Margin="0,5,0,0"/>
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Grid.Column="1" Spacing="10">
+                            <Label Text="Dar Baixa / Retirar do Estoque" FontAttributes="Bold" TextColor="#34495E" FontSize="14"/>
+                            <Entry x:Name="txtIdRetirada" Placeholder="ID do Produto" Keyboard="Numeric" TextColor="Black" PlaceholderColor="#7F8C8D" BackgroundColor="#F8F9FA"/>
+                            <Entry x:Name="txtQtdRetirada" Placeholder="Quantidade a Retirar" Keyboard="Numeric" TextColor="Black" PlaceholderColor="#7F8C8D" BackgroundColor="#F8F9FA"/>
+                            <Button Text="➖ Confirmar Retirada" Clicked="OnRetirarClicked" BackgroundColor="#E74C3C" TextColor="White" FontAttributes="Bold" Margin="0,5,0,0"/>
+                            <Label Text="*Abaixe o estoque gerando dados em Pedidos_Vendas." FontSize="11" TextColor="#7F8C8D" Margin="0,5,0,0"/>
+                        </VerticalStackLayout>
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+
+            <Label Text="📱 Eletrônicos em Estoque" FontSize="18" FontAttributes="Bold" TextColor="#2C3E50" Margin="0,10,0,0"/>
+
+            <CollectionView x:Name="listaProdutosCollection">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="12"/>
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame BackgroundColor="White" CornerRadius="10" BorderColor="Transparent" Padding="15">
+                            <Grid ColumnDefinitions="*, Auto">
+                                <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                    <Label Text="{Binding IdProduto, StringFormat='[ID: {0}]'}" FontSize="12" FontAttributes="Bold" TextColor="#7F8C8D"/>
+                                    <Label Text="{Binding Nome}" FontSize="16" FontAttributes="Bold" TextColor="#2C3E50"/>
+                                    <Label Text="{Binding Preco, StringFormat='R$ {0:F2}'}" FontSize="14" TextColor="#27AE60" FontAttributes="Bold"/>
+                                </VerticalStackLayout>
+                                <Frame Grid.Column="1" BackgroundColor="#34495E" CornerRadius="8" Padding="12,5" HasShadow="False" VerticalOptions="Center">
+                                    <Label Text="{Binding QuantidadeEstoque, StringFormat='Qtd: {0}'}" TextColor="White" FontSize="13" FontAttributes="Bold"/>
+                                </Frame>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

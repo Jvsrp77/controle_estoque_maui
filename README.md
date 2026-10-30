@@ -10,13 +10,16 @@ Projeto acadêmico de Engenharia da Computação (Univap), com foco em modelagem
 
 ## O que o projeto faz
 
-A aplicação é organizada em três abas (`Shell` com `TabBar`):
+A aplicação é organizada em quatro abas (`Shell` com `TabBar`):
 
 - **Estoque** — painel com total de unidades e contagem de esgotados; cadastro, **edição e exclusão** de
   produtos, com categoria e fornecedor escolhidos em lista suspensa; e baixa de estoque por venda.
   Produto já vendido não pode ser excluído: a chave estrangeira de `Itens_Pedido` protege o histórico.
 - **Fornecedores** — cadastro e listagem de fornecedores (razão social e CNPJ).
 - **Categorias** — cadastro e listagem de categorias de produto.
+- **Vendas** — histórico do que a transação de baixa registrou: pedido, data, produto,
+  quantidade, preço praticado e total, com faturamento do dia e do mês. É o lado de
+  leitura de `Pedidos_Vendas` e `Itens_Pedido`.
 
 ### Baixa de estoque transacional
 
@@ -75,7 +78,8 @@ controle_estoque_maui.Core/        biblioteca net10.0, sem dependência de UI
     ├── ProdutoDAO.cs              CRUD de produto
     ├── CategoriaDAO.cs
     ├── FornecedorDAO.cs
-    └── PedidoVendaDAO.cs          venda transacional
+    ├── PedidoVendaDAO.cs          venda transacional
+    └── VendaDAO.cs                consulta do histórico (JOIN de três tabelas)
 
 controle_estoque_maui/             aplicação MAUI
 ├── MauiProgram.cs                 registro das dependências
@@ -83,11 +87,13 @@ controle_estoque_maui/             aplicação MAUI
 └── Views/
     ├── EstoquePage                painel, cadastro, edição, exclusão e baixa
     ├── FornecedorPage
-    └── CategoriaPage
+    ├── CategoriaPage
+    └── VendasPage                 histórico e faturamento
 
 controle_estoque_maui.Tests/       xUnit
 ├── BancoDeTesteFixture.cs         cria e derruba um banco por execução
-└── RegistrarVendaTests.cs
+├── RegistrarVendaTests.cs
+└── HistoricoDeVendasTests.cs
 ```
 
 ## Banco de dados
@@ -187,7 +193,7 @@ São testes de **integração**: cada execução cria um banco descartável
 banco de desenvolvimento. Exigem um MySQL/MariaDB acessível — o endereço vem de
 `ESTOQUE_TESTE_SERVIDOR`, com `localhost:3307` como padrão.
 
-Cinco testes cobrem a venda transacional:
+Oito testes cobrem a venda e o histórico:
 
 | Teste | O que garante |
 |---|---|
@@ -196,6 +202,9 @@ Cinco testes cobrem a venda transacional:
 | Produto inexistente | Devolve `ProdutoNaoEncontrado` sem lançar exceção |
 | Venda do saldo exato | Aceita a última unidade e recusa a seguinte |
 | **Vendas simultâneas** | Dez vendas disputando estoque de 6: exatamente 6 passam, 4 são recusadas, saldo final zero — nunca negativo |
+| Histórico da venda | A venda aparece listada com o nome do produto e o preço praticado |
+| **Preço histórico** | Alterar o preço do produto depois da venda **não** altera o que ficou registrado |
+| Venda recusada | Não aparece no histórico, nem soma no faturamento |
 
 O último é o que justifica a conferência estar dentro do `UPDATE`. Ele falhava
 com deadlock quando a baixa era a última das três escritas; foi o que motivou
@@ -216,8 +225,10 @@ considerar isto pronto para produção:
 - **Code-behind em vez de MVVM.** As páginas manipulam controles diretamente.
   Com `ViewModel` e *binding* bidirecional a lógica de tela ficaria testável
   junto com o resto.
-- **A listagem carrega todos os produtos.** Sem paginação nem busca, o que
-  basta para a escala do trabalho e não para um catálogo real.
+- **As listagens carregam tudo.** Sem paginação nem busca nos produtos; o
+  histórico de vendas limita em 100 linhas e não tem filtro por período.
+- **Só há saída de estoque.** Não existe movimento de entrada: produto que
+  zera só volta a ter saldo por edição manual.
 - **`Frame` está obsoleto** desde o .NET 9 e ainda aparece nas telas de
   categoria e fornecedor; a de estoque já usa `Border`.
 - **Os testes exigem um banco de verdade.** Não há *fake* do acesso a dados,

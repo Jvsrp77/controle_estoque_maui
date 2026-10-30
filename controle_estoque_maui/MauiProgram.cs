@@ -27,11 +27,13 @@ namespace controle_estoque_maui
             builder.Services.AddSingleton<IPedidoVendaDAO, PedidoVendaDAO>();
             builder.Services.AddSingleton<ICategoriaDAO, CategoriaDAO>();
             builder.Services.AddSingleton<IFornecedorDAO, FornecedorDAO>();
+            builder.Services.AddSingleton<IVendaDAO, VendaDAO>();
 
             // Páginas e shell, para receberem as dependências pelo construtor.
             builder.Services.AddTransient<EstoquePage>();
             builder.Services.AddTransient<FornecedorPage>();
             builder.Services.AddTransient<CategoriaPage>();
+            builder.Services.AddTransient<VendasPage>();
             builder.Services.AddTransient<AppShell>();
 
 #if DEBUG

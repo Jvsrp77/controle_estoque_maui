@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="controle_estoque_maui.Views.VendasPage"
+             BackgroundColor="#F4F6F9"
+             Title="Histórico de Vendas">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+
+            <Border BackgroundColor="#1E1E2E" StrokeShape="RoundRectangle 12" Stroke="Transparent" Padding="20">
+                <HorizontalStackLayout Spacing="15" VerticalOptions="Center">
+                    <Label Text="🧾" FontSize="32" VerticalOptions="Center"/>
+                    <VerticalStackLayout VerticalOptions="Center">
+                        <Label Text="VENDAS" FontSize="24" FontAttributes="Bold" TextColor="White"/>
+                        <Label Text="O que a transação de baixa registrou" FontSize="14" TextColor="#A5A5B5"/>
+                    </VerticalStackLayout>
+                </HorizontalStackLayout>
+            </Border>
+
+            <Grid ColumnDefinitions="*, *, *" ColumnSpacing="15">
+                <Border Grid.Column="0" BackgroundColor="White" StrokeShape="RoundRectangle 10" Stroke="Transparent" Padding="15">
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Faturamento hoje" FontSize="13" TextColor="#7F8C8D" FontAttributes="Bold"/>
+                        <Label x:Name="lblFaturamentoHoje" Text="R$ 0,00" FontSize="24" FontAttributes="Bold" TextColor="#27AE60"/>
+                        <Label x:Name="lblUnidadesHoje" Text="0 unidades" FontSize="12" TextColor="#95A5A6"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Grid.Column="1" BackgroundColor="White" StrokeShape="RoundRectangle 10" Stroke="Transparent" Padding="15">
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Faturamento do mês" FontSize="13" TextColor="#7F8C8D" FontAttributes="Bold"/>
+                        <Label x:Name="lblFaturamentoMes" Text="R$ 0,00" FontSize="24" FontAttributes="Bold" TextColor="#2C3E50"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Grid.Column="2" BackgroundColor="White" StrokeShape="RoundRectangle 10" Stroke="Transparent" Padding="15">
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Pedidos registrados" FontSize="13" TextColor="#7F8C8D" FontAttributes="Bold"/>
+                        <Label x:Name="lblPedidosTotal" Text="0" FontSize="24" FontAttributes="Bold" TextColor="#2C3E50"/>
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+
+            <Grid ColumnDefinitions="*, Auto">
+                <Label Grid.Column="0" Text="📋 Últimas movimentações" FontSize="18" FontAttributes="Bold"
+                       TextColor="#2C3E50" VerticalOptions="Center"/>
+                <Button Grid.Column="1" Text="Atualizar" Clicked="OnAtualizarClicked" FontSize="13"
+                        BackgroundColor="#34495E" TextColor="White" Padding="16,6"/>
+            </Grid>
+
+            <Label x:Name="lblVazio" Text="Nenhuma venda registrada ainda. Dê baixa em um produto na aba Estoque."
+                   FontSize="14" TextColor="#95A5A6" IsVisible="False"/>
+
+            <CollectionView x:Name="listaVendas">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="10"/>
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border BackgroundColor="White" StrokeShape="RoundRectangle 10" Stroke="Transparent" Padding="15">
+                            <Grid ColumnDefinitions="Auto, *, Auto, Auto" ColumnSpacing="15">
+                                <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                                    <Label Text="{Binding IdPedido, StringFormat='#{0}'}" FontSize="13" FontAttributes="Bold" TextColor="#7F8C8D"/>
+                                    <Label Text="{Binding DataVenda, StringFormat='{0:dd/MM HH:mm}'}" FontSize="11" TextColor="#95A5A6"/>
+                                </VerticalStackLayout>
+
+                                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                    <Label Text="{Binding Produto}" FontSize="15" FontAttributes="Bold" TextColor="#2C3E50"/>
+                                    <Label Text="{Binding PrecoFormatado, StringFormat='unitário na venda: {0}'}" FontSize="12" TextColor="#95A5A6"/>
+                                </VerticalStackLayout>
+
+                                <Border Grid.Column="2" BackgroundColor="#34495E" StrokeShape="RoundRectangle 8" Stroke="Transparent"
+                                        Padding="10,4" VerticalOptions="Center">
+                                    <Label Text="{Binding Quantidade, StringFormat='{0} un'}" TextColor="White" FontSize="12" FontAttributes="Bold"/>
+                                </Border>
+
+                                <Label Grid.Column="3" Text="{Binding Total, StringFormat='R$ {0:F2}'}" FontSize="16"
+                                       FontAttributes="Bold" TextColor="#27AE60" VerticalOptions="Center"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

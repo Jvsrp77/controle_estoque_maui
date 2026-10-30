@@ -16,6 +16,9 @@
         <Tab Title="📁 Categorias">
             <ShellContent x:Name="abaCategorias" Route="CategoriaPage" />
         </Tab>
+        <Tab Title="🧾 Vendas">
+            <ShellContent x:Name="abaVendas" Route="VendasPage" />
+        </Tab>
     </TabBar>
 
 </Shell>

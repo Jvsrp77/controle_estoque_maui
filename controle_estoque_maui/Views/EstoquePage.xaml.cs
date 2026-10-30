@@ -1,127 +1,240 @@
-using System;
-using System.Collections.Generic;
-using Microsoft.Maui.Controls;
-using controle_estoque_maui.DAO;
+using controle_estoque_maui.Interfaces;
 using controle_estoque_maui.models;
 
 namespace controle_estoque_maui.Views
 {
     public partial class EstoquePage : ContentPage
     {
-        private readonly ProdutoDAO _produtoDAO;
-        private readonly PedidoVendaDAO _pedidoVendaDAO;
+        private readonly IProdutoDAO _produtoDAO;
+        private readonly IPedidoVendaDAO _pedidoVendaDAO;
+        private readonly ICategoriaDAO _categoriaDAO;
+        private readonly IFornecedorDAO _fornecedorDAO;
 
-        public EstoquePage()
+        /// <summary>Produto em edição; nulo quando o formulário está cadastrando.</summary>
+        private Produto? _emEdicao;
+
+        public EstoquePage(IProdutoDAO produtoDAO,
+                           IPedidoVendaDAO pedidoVendaDAO,
+                           ICategoriaDAO categoriaDAO,
+                           IFornecedorDAO fornecedorDAO)
         {
             InitializeComponent();
-            _produtoDAO = new ProdutoDAO();
-            _pedidoVendaDAO = new PedidoVendaDAO();
-            CarregarDadosEstoque();
+            _produtoDAO = produtoDAO;
+            _pedidoVendaDAO = pedidoVendaDAO;
+            _categoriaDAO = categoriaDAO;
+            _fornecedorDAO = fornecedorDAO;
         }
 
-        private void CarregarDadosEstoque()
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+            await CarregarCombosAsync();
+            await CarregarDadosEstoqueAsync();
+        }
+
+        private async Task CarregarCombosAsync()
         {
             try
             {
-                List<Produto> listaCompleta = _produtoDAO.ListarTodos();
-
-                int totalEstoque = 0;
-                int totalEsgotados = 0;
-
-                foreach (var prod in listaCompleta)
-                {
-                    if (prod.QuantidadeEstoque > 0)
-                        totalEstoque += prod.QuantidadeEstoque;
-                    else
-                        totalEsgotados++;
-                }
-
-                lblTotalProdutos.Text = totalEstoque.ToString();
-                lblProdutosEsgotados.Text = totalEsgotados.ToString();
-                listaProdutosCollection.ItemsSource = listaCompleta;
+                pickerCategoria.ItemsSource = await _categoriaDAO.ListarTodasAsync();
+                pickerFornecedor.ItemsSource = await _fornecedorDAO.ListarTodosAsync();
             }
             catch (Exception ex)
             {
-                DisplayAlert("Erro", $"Erro ao carregar dados: {ex.Message}", "OK");
+                await DisplayAlert("Erro", $"Não foi possível carregar categorias e fornecedores: {ex.Message}", "OK");
             }
         }
 
-        private void OnCadastrarClicked(object sender, EventArgs e)
+        private async Task CarregarDadosEstoqueAsync()
         {
-            if (string.IsNullOrWhiteSpace(txtNome.Text) || string.IsNullOrWhiteSpace(txtPreco.Text) ||
-                string.IsNullOrWhiteSpace(txtQuantidade.Text) || string.IsNullOrWhiteSpace(txtIdCategoriaProd.Text) ||
-                string.IsNullOrWhiteSpace(txtIdFornecedorProd.Text))
+            try
             {
-                DisplayAlert("Aviso", "Preencha todos os campos, incluindo os IDs de Categoria e Fornecedor!", "OK");
+                var lista = await _produtoDAO.ListarTodosAsync();
+
+                lblTotalProdutos.Text = lista.Sum(p => p.QuantidadeEstoque > 0 ? p.QuantidadeEstoque : 0).ToString();
+                lblProdutosEsgotados.Text = lista.Count(p => !p.TemEstoque).ToString();
+                listaProdutosCollection.ItemsSource = lista;
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Erro", $"Erro ao carregar dados: {ex.Message}", "OK");
+            }
+        }
+
+        private async void OnSalvarClicked(object? sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtNome.Text) ||
+                string.IsNullOrWhiteSpace(txtPreco.Text) ||
+                string.IsNullOrWhiteSpace(txtQuantidade.Text))
+            {
+                await DisplayAlert("Aviso", "Preencha nome, preço e quantidade.", "OK");
+                return;
+            }
+
+            if (pickerCategoria.SelectedItem is not Categoria categoria ||
+                pickerFornecedor.SelectedItem is not Fornecedor fornecedor)
+            {
+                await DisplayAlert("Aviso", "Selecione a categoria e o fornecedor.", "OK");
+                return;
+            }
+
+            if (!decimal.TryParse(txtPreco.Text, out var preco) ||
+                !int.TryParse(txtQuantidade.Text, out var quantidade))
+            {
+                await DisplayAlert("Aviso", "Preço e quantidade precisam ser números.", "OK");
+                return;
+            }
+
+            var produto = new Produto
+            {
+                IdProduto = _emEdicao?.IdProduto ?? 0,
+                Nome = txtNome.Text.Trim(),
+                Preco = preco,
+                QuantidadeEstoque = quantidade,
+                IdCategoria = categoria.IdCategoria,
+                IdFornecedor = fornecedor.IdFornecedor
+            };
+
+            try
+            {
+                btnSalvar.IsEnabled = false;
+
+                if (_emEdicao is null)
+                {
+                    await _produtoDAO.InserirAsync(produto);
+                    await DisplayAlert("Sucesso", "Produto cadastrado.", "OK");
+                }
+                else
+                {
+                    await _produtoDAO.AlterarAsync(produto);
+                    await DisplayAlert("Sucesso", "Produto alterado.", "OK");
+                }
+
+                LimparFormulario();
+                await CarregarDadosEstoqueAsync();
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Erro ao salvar", ex.Message, "OK");
+            }
+            finally
+            {
+                btnSalvar.IsEnabled = true;
+            }
+        }
+
+        private void OnEditarClicked(object? sender, EventArgs e)
+        {
+            if (sender is not Button { BindingContext: Produto produto }) return;
+
+            _emEdicao = produto;
+
+            txtNome.Text = produto.Nome;
+            txtPreco.Text = produto.Preco.ToString("F2");
+            txtQuantidade.Text = produto.QuantidadeEstoque.ToString();
+
+            pickerCategoria.SelectedItem =
+                (pickerCategoria.ItemsSource as IEnumerable<Categoria>)?
+                    .FirstOrDefault(c => c.IdCategoria == produto.IdCategoria);
+            pickerFornecedor.SelectedItem =
+                (pickerFornecedor.ItemsSource as IEnumerable<Fornecedor>)?
+                    .FirstOrDefault(f => f.IdFornecedor == produto.IdFornecedor);
+
+            lblTituloFormulario.Text = $"Editando: {produto.Nome}";
+            btnSalvar.Text = "💾 Salvar Alterações";
+            btnCancelarEdicao.IsVisible = true;
+        }
+
+        private void OnCancelarEdicaoClicked(object? sender, EventArgs e) => LimparFormulario();
+
+        private async void OnExcluirClicked(object? sender, EventArgs e)
+        {
+            if (sender is not Button { BindingContext: Produto produto }) return;
+
+            bool confirma = await DisplayAlert(
+                "Excluir produto",
+                $"Excluir {produto.Nome}? A operação não pode ser desfeita.",
+                "Excluir", "Cancelar");
+
+            if (!confirma) return;
+
+            try
+            {
+                await _produtoDAO.ExcluirAsync(produto.IdProduto);
+                if (_emEdicao?.IdProduto == produto.IdProduto) LimparFormulario();
+                await CarregarDadosEstoqueAsync();
+            }
+            catch (Exception ex)
+            {
+                // Produto já vendido tem registro em Itens_Pedido, e a chave
+                // estrangeira impede a exclusão: o banco protege o histórico.
+                await DisplayAlert("Não foi possível excluir",
+                    "Produto com venda registrada não pode ser removido, para não quebrar o histórico de pedidos.\n\n"
+                    + ex.Message, "OK");
+            }
+        }
+
+        private void LimparFormulario()
+        {
+            _emEdicao = null;
+            txtNome.Text = txtPreco.Text = txtQuantidade.Text = string.Empty;
+            pickerCategoria.SelectedItem = null;
+            pickerFornecedor.SelectedItem = null;
+            lblTituloFormulario.Text = "Novo Produto";
+            btnSalvar.Text = "➕ Cadastrar Produto";
+            btnCancelarEdicao.IsVisible = false;
+        }
+
+        private async void OnRetirarClicked(object? sender, EventArgs e)
+        {
+            if (!int.TryParse(txtIdRetirada.Text, out var id) ||
+                !int.TryParse(txtQtdRetirada.Text, out var quantidade) || quantidade <= 0)
+            {
+                await DisplayAlert("Aviso", "Informe um ID válido e uma quantidade maior que zero.", "OK");
                 return;
             }
 
             try
             {
-                Produto novo = new Produto
+                btnRetirar.IsEnabled = false;
+
+                var produto = await _produtoDAO.ObterPorIdAsync(id);
+                if (produto is null)
                 {
-                    Nome = txtNome.Text,
-                    Preco = Convert.ToDecimal(txtPreco.Text),
-                    QuantidadeEstoque = Convert.ToInt32(txtQuantidade.Text),
-                    IdCategoria = Convert.ToInt32(txtIdCategoriaProd.Text),
-                    IdFornecedor = Convert.ToInt32(txtIdFornecedorProd.Text)
-                };
-
-                _produtoDAO.Inserir(novo);
-                DisplayAlert("Sucesso", "Produto cadastrado amarrando todas as tabelas relacionais!", "OK");
-
-                txtNome.Text = string.Empty;
-                txtPreco.Text = string.Empty;
-                txtQuantidade.Text = string.Empty;
-                txtIdCategoriaProd.Text = string.Empty;
-                txtIdFornecedorProd.Text = string.Empty;
-
-                CarregarDadosEstoque();
-            }
-            catch (Exception ex)
-            {
-                DisplayAlert("Erro de Chave Estrangeira", "Esse ID de Categoria ou Fornecedor não existe! Cadastre-os primeiro nas abas correspondentes. Erro: " + ex.Message, "OK");
-            }
-        }
-
-        private void OnRetirarClicked(object sender, EventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(txtIdRetirada.Text) || string.IsNullOrWhiteSpace(txtQtdRetirada.Text))
-            {
-                DisplayAlert("Aviso", "Preencha o ID e a Quantidade a ser retirada!", "OK");
-                return;
-            }
-
-            try
-            {
-                int id = Convert.ToInt32(txtIdRetirada.Text);
-                int qtdARetirar = Convert.ToInt32(txtQtdRetirada.Text);
-
-                Produto produtoBanco = _produtoDAO.ObterPorId(id);
-
-                if (produtoBanco == null)
-                {
-                    DisplayAlert("Erro", "Produto não encontrado com este ID!", "OK");
+                    await DisplayAlert("Erro", "Produto não encontrado com este ID.", "OK");
                     return;
                 }
 
-                if (produtoBanco.QuantidadeEstoque < qtdARetirar)
+                // A conferência de saldo acontece dentro da transação, no próprio
+                // UPDATE. Aqui só traduzimos o desfecho para o usuário.
+                var resultado = await _pedidoVendaDAO.RegistrarVendaAsync(produto.IdProduto, quantidade, produto.Preco);
+
+                switch (resultado)
                 {
-                    DisplayAlert("Estoque Insuficiente", $"Você só possui {produtoBanco.QuantidadeEstoque} unidades disponíveis.", "OK");
-                    return;
+                    case ResultadoVenda.Sucesso:
+                        await DisplayAlert("Venda concluída",
+                            "Retirada efetuada. Pedido, item e baixa de saldo gravados na mesma transação.", "OK");
+                        txtIdRetirada.Text = txtQtdRetirada.Text = string.Empty;
+                        await CarregarDadosEstoqueAsync();
+                        break;
+
+                    case ResultadoVenda.SaldoInsuficiente:
+                        await DisplayAlert("Estoque insuficiente",
+                            $"Não há {quantidade} unidades de {produto.Nome} disponíveis. Nada foi gravado.", "OK");
+                        break;
+
+                    case ResultadoVenda.ProdutoNaoEncontrado:
+                        await DisplayAlert("Erro", "O produto deixou de existir durante a operação.", "OK");
+                        break;
                 }
-
-                _pedidoVendaDAO.RegistrarVenda(produtoBanco.IdProduto, qtdARetirar, produtoBanco.Preco);
-                DisplayAlert("Venda Concluída", "Retirada efetuada! Dados gravados em 'Pedidos_Vendas' e 'Itens_Pedido'.", "OK");
-
-                txtIdRetirada.Text = string.Empty;
-                txtQtdRetirada.Text = string.Empty;
-
-                CarregarDadosEstoque();
             }
             catch (Exception ex)
             {
-                DisplayAlert("Erro ao Retirar", ex.Message, "OK");
+                await DisplayAlert("Erro ao retirar", ex.Message, "OK");
+            }
+            finally
+            {
+                btnRetirar.IsEnabled = true;
             }
         }
     }

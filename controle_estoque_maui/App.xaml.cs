@@ -1,17 +1,16 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
 namespace controle_estoque_maui
 {
     public partial class App : Application
     {
-        public App()
+        private readonly IServiceProvider _services;
+
+        public App(IServiceProvider services)
         {
             InitializeComponent();
+            _services = services;
         }
 
         protected override Window CreateWindow(IActivationState? activationState)
-        {
-            return new Window(new AppShell());
-        }
+            => new Window(_services.GetRequiredService<AppShell>());
     }
 }

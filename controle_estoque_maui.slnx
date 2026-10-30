@@ -1,3 +1,5 @@
 <Solution>
   <Project Path="controle_estoque_maui/controle_estoque_maui.csproj" />
+  <Project Path="controle_estoque_maui.Core/controle_estoque_maui.Core.csproj" />
+  <Project Path="controle_estoque_maui.Tests/controle_estoque_maui.Tests.csproj" />
 </Solution>

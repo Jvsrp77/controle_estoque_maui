@@ -8,7 +8,7 @@
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="20">
 
-            <Frame BackgroundColor="#1E1E2E" CornerRadius="12" BorderColor="Transparent" Padding="20">
+            <Border BackgroundColor="#1E1E2E" StrokeShape="RoundRectangle 12" Stroke="Transparent" Padding="20">
                 <HorizontalStackLayout Spacing="15" VerticalOptions="Center">
                     <Label Text="📦" FontSize="32" VerticalOptions="Center"/>
                     <VerticalStackLayout VerticalOptions="Center">
@@ -16,49 +16,56 @@
                         <Label Text="Gerenciamento de Eletrônicos" FontSize="14" TextColor="#A5A5B5"/>
                     </VerticalStackLayout>
                 </HorizontalStackLayout>
-            </Frame>
+            </Border>
 
             <Grid ColumnDefinitions="*, *" ColumnSpacing="15">
-                <Frame Grid.Column="0" BackgroundColor="#FFFFFF" CornerRadius="10" BorderColor="Transparent" Padding="15">
+                <Border Grid.Column="0" BackgroundColor="White" StrokeShape="RoundRectangle 10" Stroke="Transparent" Padding="15">
                     <VerticalStackLayout Spacing="5">
                         <Label Text="Produtos em Estoque" FontSize="14" TextColor="#7F8C8D" FontAttributes="Bold"/>
                         <Label x:Name="lblTotalProdutos" Text="0" FontSize="28" FontAttributes="Bold" TextColor="#2C3E50"/>
                     </VerticalStackLayout>
-                </Frame>
+                </Border>
 
-                <Frame Grid.Column="1" BackgroundColor="#FFFFFF" CornerRadius="10" BorderColor="Transparent" Padding="15">
+                <Border Grid.Column="1" BackgroundColor="White" StrokeShape="RoundRectangle 10" Stroke="Transparent" Padding="15">
                     <VerticalStackLayout Spacing="5">
                         <Label Text="Produtos Esgotados" FontSize="14" TextColor="#7F8C8D" FontAttributes="Bold"/>
                         <Label x:Name="lblProdutosEsgotados" Text="0" FontSize="28" FontAttributes="Bold" TextColor="#E74C3C"/>
                     </VerticalStackLayout>
-                </Frame>
+                </Border>
             </Grid>
 
-            <Frame BackgroundColor="White" CornerRadius="10" BorderColor="Transparent" Padding="20">
+            <Border BackgroundColor="White" StrokeShape="RoundRectangle 10" Stroke="Transparent" Padding="20">
                 <VerticalStackLayout Spacing="15">
                     <Label Text="⚡ Operações de Estoque" FontSize="16" FontAttributes="Bold" TextColor="#2C3E50"/>
 
                     <Grid ColumnDefinitions="*, *" ColumnSpacing="20">
                         <VerticalStackLayout Grid.Column="0" Spacing="10">
-                            <Label Text="Novo Produto" FontAttributes="Bold" TextColor="#34495E" FontSize="14"/>
+                            <Label x:Name="lblTituloFormulario" Text="Novo Produto" FontAttributes="Bold" TextColor="#34495E" FontSize="14"/>
                             <Entry x:Name="txtNome" Placeholder="Nome do Eletrônico" TextColor="Black" PlaceholderColor="#7F8C8D" BackgroundColor="#F8F9FA"/>
                             <Entry x:Name="txtPreco" Placeholder="Preço (Ex: 4500.00)" Keyboard="Numeric" TextColor="Black" PlaceholderColor="#7F8C8D" BackgroundColor="#F8F9FA"/>
                             <Entry x:Name="txtQuantidade" Placeholder="Qtd Inicial" Keyboard="Numeric" TextColor="Black" PlaceholderColor="#7F8C8D" BackgroundColor="#F8F9FA"/>
-                            <Entry x:Name="txtIdCategoriaProd" Placeholder="ID da Categoria (Ver aba Categorias)" Keyboard="Numeric" TextColor="Black" PlaceholderColor="#7F8C8D" BackgroundColor="#FFF3CD"/>
-                            <Entry x:Name="txtIdFornecedorProd" Placeholder="ID do Fornecedor (Ver aba Fornecedores)" Keyboard="Numeric" TextColor="Black" PlaceholderColor="#7F8C8D" BackgroundColor="#FFF3CD"/>
-                            <Button Text="➕ Cadastrar Produto" Clicked="OnCadastrarClicked" BackgroundColor="#27AE60" TextColor="White" FontAttributes="Bold" Margin="0,5,0,0"/>
+
+                            <Picker x:Name="pickerCategoria" Title="Selecione a categoria" TextColor="Black" TitleColor="#7F8C8D" BackgroundColor="#F8F9FA"/>
+                            <Picker x:Name="pickerFornecedor" Title="Selecione o fornecedor" TextColor="Black" TitleColor="#7F8C8D" BackgroundColor="#F8F9FA"/>
+
+                            <Button x:Name="btnSalvar" Text="➕ Cadastrar Produto" Clicked="OnSalvarClicked"
+                                    BackgroundColor="#27AE60" TextColor="White" FontAttributes="Bold" Margin="0,5,0,0"/>
+                            <Button x:Name="btnCancelarEdicao" Text="Cancelar edição" Clicked="OnCancelarEdicaoClicked"
+                                    IsVisible="False" BackgroundColor="#95A5A6" TextColor="White" FontSize="13"/>
                         </VerticalStackLayout>
 
                         <VerticalStackLayout Grid.Column="1" Spacing="10">
                             <Label Text="Dar Baixa / Retirar do Estoque" FontAttributes="Bold" TextColor="#34495E" FontSize="14"/>
                             <Entry x:Name="txtIdRetirada" Placeholder="ID do Produto" Keyboard="Numeric" TextColor="Black" PlaceholderColor="#7F8C8D" BackgroundColor="#F8F9FA"/>
                             <Entry x:Name="txtQtdRetirada" Placeholder="Quantidade a Retirar" Keyboard="Numeric" TextColor="Black" PlaceholderColor="#7F8C8D" BackgroundColor="#F8F9FA"/>
-                            <Button Text="➖ Confirmar Retirada" Clicked="OnRetirarClicked" BackgroundColor="#E74C3C" TextColor="White" FontAttributes="Bold" Margin="0,5,0,0"/>
-                            <Label Text="*Abaixe o estoque gerando dados em Pedidos_Vendas." FontSize="11" TextColor="#7F8C8D" Margin="0,5,0,0"/>
+                            <Button x:Name="btnRetirar" Text="➖ Confirmar Retirada" Clicked="OnRetirarClicked"
+                                    BackgroundColor="#E74C3C" TextColor="White" FontAttributes="Bold" Margin="0,5,0,0"/>
+                            <Label Text="A baixa grava em Pedidos_Vendas e Itens_Pedido na mesma transação do saldo."
+                                   FontSize="11" TextColor="#7F8C8D" Margin="0,5,0,0"/>
                         </VerticalStackLayout>
                     </Grid>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
             <Label Text="📱 Eletrônicos em Estoque" FontSize="18" FontAttributes="Bold" TextColor="#2C3E50" Margin="0,10,0,0"/>
 
@@ -68,18 +75,25 @@
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Frame BackgroundColor="White" CornerRadius="10" BorderColor="Transparent" Padding="15">
-                            <Grid ColumnDefinitions="*, Auto">
+                        <Border BackgroundColor="White" StrokeShape="RoundRectangle 10" Stroke="Transparent" Padding="15">
+                            <Grid ColumnDefinitions="*, Auto, Auto, Auto" ColumnSpacing="10">
                                 <VerticalStackLayout Grid.Column="0" Spacing="2">
                                     <Label Text="{Binding IdProduto, StringFormat='[ID: {0}]'}" FontSize="12" FontAttributes="Bold" TextColor="#7F8C8D"/>
                                     <Label Text="{Binding Nome}" FontSize="16" FontAttributes="Bold" TextColor="#2C3E50"/>
                                     <Label Text="{Binding Preco, StringFormat='R$ {0:F2}'}" FontSize="14" TextColor="#27AE60" FontAttributes="Bold"/>
                                 </VerticalStackLayout>
-                                <Frame Grid.Column="1" BackgroundColor="#34495E" CornerRadius="8" Padding="12,5" HasShadow="False" VerticalOptions="Center">
+
+                                <Border Grid.Column="1" BackgroundColor="#34495E" StrokeShape="RoundRectangle 8" Stroke="Transparent"
+                                        Padding="12,5" VerticalOptions="Center">
                                     <Label Text="{Binding QuantidadeEstoque, StringFormat='Qtd: {0}'}" TextColor="White" FontSize="13" FontAttributes="Bold"/>
-                                </Frame>
+                                </Border>
+
+                                <Button Grid.Column="2" Text="Editar" Clicked="OnEditarClicked" FontSize="12"
+                                        BackgroundColor="#2980B9" TextColor="White" Padding="12,4" VerticalOptions="Center"/>
+                                <Button Grid.Column="3" Text="Excluir" Clicked="OnExcluirClicked" FontSize="12"
+                                        BackgroundColor="#C0392B" TextColor="White" Padding="12,4" VerticalOptions="Center"/>
                             </Grid>
-                        </Frame>
+                        </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>

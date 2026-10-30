@@ -1,4 +1,4 @@
-﻿namespace controle_estoque_maui.models
+namespace controle_estoque_maui.models
 {
     public class Produto
     {
@@ -9,7 +9,6 @@
         public int IdCategoria { get; set; }
         public int IdFornecedor { get; set; }
 
-        // Propriedade para validar de forma simples se há estoque restante
         public bool TemEstoque => QuantidadeEstoque > 0;
     }
 }
